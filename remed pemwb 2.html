@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RumahKayu Furniture Jepara - Premium Jati</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #fdfbf8;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header {
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(139,69,19,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* KERANJANG UI */
+        .cart-btn {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.8rem; /* Ikon utama digedein dikit */
+            color: white;
+            padding: 5px 15px;
+            transition: transform 0.2s;
+        }
+
+        #cart-count {
+            position: absolute;
+            top: 0; right: 0;
+            background: #ff4500;
+            color: white;
+            font-size: 0.8rem;
+            padding: 2px 7px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* ANIMASI TERBANG (FLY TO CART) - DIGEDEIN */
+        .flying-item {
+            position: fixed;
+            z-index: 9999;
+            font-size: 3.5rem; /* Ikon terbang digedein jadi 3.5rem */
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); /* Efek glow emas */
+            transition: all 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .cart-modal {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 350px; height: 100vh;
+            background: white; z-index: 2000;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            transition: 0.5s; padding: 20px;
+            display: flex; flex-direction: column;
+        }
+        .cart-modal.active { right: 0; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .btn-remove { background: #ff4d4d; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; }
+        .btn-checkout { background: #25D366; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 15px; }
+
+        /* MODAL KONFIRMASI */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay.active { display: flex; }
+        .confirm-box {
+            background: white; padding: 30px; border-radius: 25px; text-align: center;
+            max-width: 400px; width: 90%; transform: scale(0.8); transition: 0.3s;
+        }
+        .overlay.active .confirm-box { transform: scale(1); }
+        .btn-yes { background: #8B4513; color: white; border: none; padding: 10px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .btn-no { background: #eee; color: #333; border: none; padding: 10px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+
+        /* HERO & PRODUCTS */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4FidRYrDEQjqr-s9enPTrxvbTPFz9R1OaSg&s') center/cover;
+            display: flex; align-items: center; justify-content: center; color: white; text-align: center;
+        }
+
+        .products { padding: 100px 0; background: #f9f7f4; }
+        h2 { text-align: center; font-size: 2.8rem; margin-bottom: 4rem; color: #8B4513; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 3rem; }
+
+        .product-card {
+            background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+            opacity: 0; transform: translateY(40px); transition: all 1s ease;
+        }
+        .product-card.reveal { opacity: 1; transform: translateY(0); }
+        .product-image { height: 320px; overflow: hidden; position: relative; }
+        .product-image img { width: 100%; height: 100%; object-fit: cover; }
+        .product-info { padding: 2rem; text-align: center; }
+        .price { font-size: 1.8rem; color: #D2691E; font-weight: bold; margin: 10px 0; }
+        .btn-add-cart { background: #8B4513; color: white; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+
+        footer { background: #1a1a1a; color: white; padding: 4rem 0 2rem; text-align: center; }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <h3 style="color: #8B4513;">Konfirmasi</h3>
+            <p id="confirmText" style="margin-top: 10px; color: #666;">Tambahkan ke keranjang?</p>
+            <div class="confirm-btns" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button class="btn-no" onclick="closeConfirm()">Batal</button>
+                <button class="btn-yes" id="confirmYes">Ya, Masukkan</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <nav class="container">
+            <div class="logo">🌳 Rumah Kayu Jati Nopall</div>
+            <div class="cart-btn" id="cart-icon-main" onclick="openCart()">🛒 <span id="cart-count">0</span></div>
+        </nav>
+    </header>
+
+    <div class="cart-modal" id="cart-modal">
+        <h3>Keranjang Saya</h3>
+        <div id="cart-items-list" style="flex-grow: 1; overflow-y: auto; margin-top: 20px;"></div>
+        <div style="border-top: 2px solid #eee; padding-top: 15px;">
+            <h4 style="display: flex; justify-content: space-between;">Total: <span id="total-price">$0</span></h4>
+            <button class="btn-checkout" onclick="checkoutWA()">Checkout via WhatsApp</button>
+            <button onclick="openCart()" style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Tutup</button>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content"><h1>Furniture Jati Premium</h1><p>Kualitas Terbaik 2026</p></div>
+    </section>
+
+    <section class="products" id="produk">
+        <div class="container">
+            <h2>🏆 Katalog Produk</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-image"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVf7k07o2XwisUmvW1eUlLDzobdRYYDy4h5w&s"><div class="product-badge">BESTSELLER</div></div>
+                    <div class="product-info"><h3>Meja Tamu Jati</h3><div class="price">$1.500.000</div><button class="btn-add-cart" onclick="askConfirm('Meja Tamu Jati', 1500000)">+ Keranjang</button></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj98tVB2Hz5PJlSRSV7n-SQzgtGOvyiVTssg&s"><div class="product-badge">NEW</div></div>
+                    <div class="product-info"><h3>Sofa L-Shape Jati</h3><div class="price">$24.800.000</div><button class="btn-add-cart" onclick="askConfirm('Sofa L-Shape Jati', 24800000)">+ Keranjang</button></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="https://upload.jaknot.com/2024/08/images/products/02bab0/original/baitai-kipas-angin-gantung-lampu-led-tri-color-with-remote-52-inch-bt225home.png"></div>
+                    <div class="product-info"><h3>Kipas Angin LED</h3><div class="price">$1.250.000</div><button class="btn-add-cart" onclick="askConfirm('Kipas Angin LED', 1250000)">+ Keranjang</button></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6MMxJaVbowKM9uKLWB-QOEj9fBYdId5GYTQ&s"></div>
+                    <div class="product-info"><h3>Rak TV Minimalis</h3><div class="price">$2.900.000</div><button class="btn-add-cart" onclick="askConfirm('Rak TV Minimalis', 2900000)">+ Keranjang</button></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="https://images.unsplash.com/photo-1594620302200-9a762244a156?w=800"></div>
+                    <div class="product-info"><h3>Rak Buku Jati</h3><div class="price">$11.200.000</div><button class="btn-add-cart" onclick="askConfirm('Rak Buku Jati', 11200000)">+ Keranjang</button></div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="https://image.made-in-china.com/202f0j00fsLUNaGnYicD/Livingroom-Furniture-Modern-Electric-Adjustable-Massage-Recliner-Chair-Sofa.webp"></div>
+                    <div class="product-info"><h3>Kursi Reclining</h3><div class="price">$980.000</div><button class="btn-add-cart" onclick="askConfirm('Kursi Reclining', 980000)">+ Keranjang</button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="contact-grid">
+                <div><h3>📱 WhatsApp</h3><p>0857-1234-5678</p></div>
+                <div><h3>📧 Email</h3><p>infoMayka@gmail.com</p></div>
+                <div><h3>📍 Showroom</h3><p>Tambun Selatan, Bekasi</p></div>
+            </div>
+            <p>© 2026 Rumah Kayu Jati Furniture | CO-Founder Mayk</p>
+        </div>
+    </footer>
+
+    <script>
+        let cart = [];
+        let tempItem = null;
+
+        function openCart() { document.getElementById('cart-modal').classList.toggle('active'); }
+
+        function askConfirm(name, price) {
+            tempItem = { name, price };
+            document.getElementById('confirmText').innerText = `Yakin ingin masukkan "${name}" ke keranjang?`;
+            document.getElementById('confirmOverlay').classList.add('active');
+            
+            document.getElementById('confirmYes').onclick = function() {
+                flyToCart();
+                setTimeout(() => {
+                    cart.push(tempItem);
+                    updateCart();
+                }, 850);
+                closeConfirm();
+            };
+        }
+
+        function flyToCart() {
+            const cartIcon = document.getElementById('cart-icon-main');
+            const flyer = document.createElement('div');
+            flyer.innerText = '🛒';
+            flyer.className = 'flying-item';
+            
+            // Start from center of screen (confirm box position)
+            flyer.style.left = '50%';
+            flyer.style.top = '50%';
+            flyer.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(flyer);
+
+            const dest = cartIcon.getBoundingClientRect();
+
+            setTimeout(() => {
+                flyer.style.left = (dest.left + 15) + 'px';
+                flyer.style.top = (dest.top + 15) + 'px';
+                flyer.style.transform = 'translate(0, 0) scale(0.3) rotate(720deg)';
+                flyer.style.opacity = '0';
+            }, 50);
+
+            setTimeout(() => {
+                flyer.remove();
+                // Getar lebih kencang pas barang sampai
+                cartIcon.style.transform = 'scale(1.5) rotate(-10deg)';
+                setTimeout(() => cartIcon.style.transform = 'scale(1) rotate(0)', 250);
+            }, 900);
+        }
+
+        function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('active'); }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateCart() {
+            const list = document.getElementById('cart-items-list');
+            const count = document.getElementById('cart-count');
+            const totalDisplay = document.getElementById('total-price');
+            let total = 0;
+            list.innerHTML = '';
+            cart.forEach((item, index) => {
+                total += item.price;
+                list.innerHTML += `<div class="cart-item"><span>${item.name}</span><div><strong>$${item.price.toLocaleString()}</strong><button class="btn-remove" onclick="removeFromCart(${index})" style="margin-left:10px;">x</button></div></div>`;
+            });
+            count.innerText = cart.length;
+            totalDisplay.innerText = '$' + total.toLocaleString();
+        }
+
+        function checkoutWA() {
+            if(cart.length === 0) return alert("Keranjang kosong!");
+            let msg = "Halo Mayka, Saya mau pesan:%0A";
+            cart.forEach(i => msg += `- ${i.name} ($${i.price.toLocaleString()})%0A`);
+            window.open(`https://wa.me/628892006161?text=${msg}`, '_blank');
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('reveal'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.product-card').forEach(card => observer.observe(card));
+    </script>
+</body>
+</html>
